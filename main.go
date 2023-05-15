@@ -55,20 +55,11 @@ func main() {
 
 	app.Get("/ws/:id", websocket.New(func(c *websocket.Conn) {
 		// Get the client ID from the URL parameter
-		// username := c.Params("username")
-		// msg := c.Query("msg")
 		id := c.Params("id")
-		// id := uuid.New()
-		// fmt.Println("id", id)
-		// fmt.Println("id", msg)
-		// var clientss []models.Client
+
 		// Add the client to the map
 		clients[id] = &models.Client{Id: id, Conn: c}
-		// clientss = append(clientss, clients)
-		// database.Database.Db.Create(&clients)
 
-		// fmt.Println("clients", clients[id])
-		// Close the connection when the client disconnects
 		defer func() {
 			delete(clients, id)
 			err := c.Close()
@@ -85,45 +76,17 @@ func main() {
 				return
 			}
 			log.Printf("Received message from client %s: %s", id, string(msg))
-			// msgss := string(msg)
-			// uniqueID := uuid.New()
-			// msgs := models.Message{
-			// 	ID:      uniqueID.String(),
-			// 	Message: msg,
-			// 	To:      id,
-			// 	From:    id,
-			// }
 
-			// ids, err := strconv.Atoi(id)
-			// SendMessage(&msgs, clientss)
 		}
 	}))
 
 	// Handler to send a message to a specific client
 	app.Get("/send/:id", func(c *fiber.Ctx) error {
-		// type payloads struct{
-		// 	message  []byte
-		// 	to string 
-		// }
-		// var payload payloads
-		// if err := c.BodyParser(&payload); err != nil {
-		// 	return err
-		// }
-		// message := payload.message
-		// to := payload.to
+		
 		id := c.Params("id")
 		msg := c.Query("msg")
-		// id := c.Params("")
-		// fmt.Println(msg)
-		// var dict map[string]string
-    // err := json.Unmarshal([]byte(msg), &dict)
-		// if err != nil {
-		// 	return err
-		// }
 
-		// fmt.Println(dict)
 
-		// fmt.Println("id", id)
 		fmt.Println("msg", msg)
 
 
@@ -156,8 +119,7 @@ func main() {
 		return nil
 	})
 
-	// Convert the fiber.Handler to an http.Handler using the fiber.Handler's func(*fiber.Ctx) error method signature
-	// handler := http.Handler(app.Handler)
+
 
 	// Start the server
 	err := app.Listen(":3000")
@@ -173,9 +135,7 @@ func SendMessage(b *models.Message, clients []models.Client) error {
 	client := models.Client{}
 	database.Database.Db.Find(&client, "id =?", b.To)
 
-	// if !ok {
-	// 	return fiber.NewError(fiber.StatusNotFound, "Client not found")
-	// }
+
 
 	err := client.Conn.WriteMessage(websocket.TextMessage, []byte(b.Message))
 	if err != nil {
